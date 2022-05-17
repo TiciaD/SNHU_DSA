@@ -23,17 +23,19 @@ class Node {
 // Singly Linked List
 class SinglyLinkedList {
     Node *head;
+    Node *tail;
     int length;
 
     public:
       SinglyLinkedList() {
         head = NULL;
+        tail = NULL;
         length = 0;
       }
       void printList();
       void append(int value);
       void prepend(int value);
-      void get(int index);
+      Node get(int index);
       void set(int index, int newValue);
 };
 
@@ -58,32 +60,58 @@ class SinglyLinkedList {
     // Create new Node.
     Node *newNode = new Node(value);
   
-    // Assign new node to head if head hasn't been set
+    // Assign new node to head and tail if head hasn't been set
     if (head == NULL) {
         head = newNode;
-        return;
-    }
-  
-    Node *temp = head;
-    // Traverse until end of list is reached
-    // tail will point to NULL at end of list
-    while (temp->next != NULL) {
-        // Update temp as we go
-        temp = temp->next;
-    }
-  
-    // When tail is found insert temp at the end as what temp next is pointing to
-    temp->next = newNode;
+        tail = head;
+    } else {
+      tail->next = newNode;
+      tail = newNode;
+    };
+
     // increment length
     length++;
 }
 
+// Function to prepend node to beginning of list
 void SinglyLinkedList::prepend(int value) {
+  // Create new Node.
+  Node *newNode = new Node(value);
 
+  // Assign new node to head if head hasn't been set
+  if (head == NULL) {
+      head = newNode;
+      tail = head;
+      return;
+  }
+
+  newNode->next = head;
+  head = newNode;
+  length++;
 }
 
+Node SinglyLinkedList::get(int index) {
+    int counter = 0;
+    Node *current = head;
+    while (counter != index) {
+      current = current->next;
+      counter++;
+    }
+    cout << current->data << endl;
+    return *current;
+}
 
 int main()
 {
+  SinglyLinkedList list;
+  list.append(5);
+  list.append(4);
+  list.append(3);
+  list.printList();
+  cout << endl;
+  list.prepend(6);
+  list.printList();
+  cout << endl;
+  list.get(2);
   return 0;
 }
