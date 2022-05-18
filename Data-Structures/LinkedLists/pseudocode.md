@@ -22,3 +22,77 @@ Linked Lists consist of nodes, and each node has a value and pointer to either a
 - Indexed in order
 - Insertion and Deletion can be expensive
 - Can quickly be accessed at a specific index
+
+## Methods for Singly Linked Lists
+
+- append: add a new node to end of list
+- prepend: add a new node to beginning of list
+- remove: remove an existing node from list
+- insert: insert a new node anywhere in list
+- search: Find an existing node in list
+- reverse: reverse order of nodes in list
+
+### Pseudocode for Singly Linked List Methods
+
+```
+FUNCTION append (value):
+
+  newNode = value
+  IF head == NULL:
+    head = newNode
+    tail = newNode
+  ELSE
+    tail->next = newNode
+    tail = newNode
+  ENDIF
+
+END
+```
+
+```
+FUNCTION prepend (value):
+
+  newNode = value
+  IF head == NULL:
+    head = newNode
+    tail = newNode
+  ELSE
+    newNode->next = head
+    head = newNode
+  ENDIF
+
+END
+```
+
+```
+FUNCTION remove (id):
+
+  temp = head;
+  IF head.id == id:
+    head = NULL
+  ELSE
+    WHILE temp.id != id:
+      prevNode = temp
+      temp = temp->next
+    ENDWHILE
+
+    prevNode->next = temp->next
+  ENDIF
+
+END
+```
+
+```
+FUNCTION search (id):
+
+  current = head
+  WHILE current != NULL:
+    IF current.id != id:
+      current = current->next
+    ELSE
+      RETURN current
+    ENDIF
+  ENDWHILE
+
+END
+```

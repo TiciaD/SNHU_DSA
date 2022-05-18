@@ -34,5 +34,6 @@
 
 .vscode
 .idea
+*.zip
 CMakeLists.txt
 cmake-build-debug

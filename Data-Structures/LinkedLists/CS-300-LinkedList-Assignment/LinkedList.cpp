@@ -10,7 +10,7 @@
 #include <iostream>
 #include <time.h>
 
-#include "CSVparser.hpp"
+#include "CSVparser.cpp"
 
 using namespace std;
 
@@ -81,6 +81,8 @@ public:
 LinkedList::LinkedList() {
     // FIXME (1): Initialize housekeeping variables
     //set head and tail equal to null
+    head = nullptr;
+    tail = nullptr;
 }
 
 /**
@@ -105,12 +107,21 @@ LinkedList::~LinkedList() {
 void LinkedList::Append(Bid bid) {
     // FIXME (2): Implement append logic
     //Create new node
+    Node* newNode = new Node(bid);
     //if there is nothing at the head...
-            // new node becomes the head and the tail
-    //else 
-        // make current tail node point to the new node
-        // and tail becomes the new node
-    //increase size count
+    if (head == nullptr) {
+      // new node becomes the head and the tail
+      head = newNode;
+      tail = newNode;
+    } else {
+      //else 
+          // make current tail node point to the new node
+          tail->next = newNode;
+          // and tail becomes the new node
+          tail = newNode;
+      //increase size count
+      size++;
+    }
 }
 
 /**
@@ -119,13 +130,17 @@ void LinkedList::Append(Bid bid) {
 void LinkedList::Prepend(Bid bid) {
     // FIXME (3): Implement prepend logic
     // Create new node
-
+    Node* newNode = new Node(bid);
     // if there is already something at the head...
-        // new node points to current head as its next node
+    if (head != nullptr) {
+      // new node points to current head as its next node
+      newNode->next = head;
+    }
 
     // head now becomes the new node
+    head = newNode;
     //increase size count
-
+    size++;
 }
 
 /**
@@ -134,10 +149,14 @@ void LinkedList::Prepend(Bid bid) {
 void LinkedList::PrintList() {
     // FIXME (4): Implement print logic
     // start at the head
-
+    Node* current = head;
     // while loop over each node looking for a match
-        //output current bidID, title, amount and fund
-        //set current equal to next
+    while (current != nullptr) {
+      //output current bidID, title, amount and fund
+      std::cout << current->bid.bidId << ": " << current->bid.title << " | " << current->bid.amount << " | " << current->bid.fund << endl;
+      //set current equal to next
+      current = current->next;
+    }
 }
 
 /**
@@ -146,24 +165,34 @@ void LinkedList::PrintList() {
  * @param bidId The bid id to remove from the list
  */
 void LinkedList::Remove(string bidId) {
-    // FIXME (5): Implement remove logic
-    // special case if matching node is the head
-        // make head point to the next node in the list
-        //decrease size count
-        //return
+  // FIXME (5): Implement remove logic
+  // start at the head
+  Node* temp = head;
+  Node* prevNode;
 
-    // start at the head
+  if(temp == nullptr){
+    return;
+  // special case if matching node is the head
+  } else if (head->bid.bidId == bidId && head->next == nullptr){
+      head = nullptr;
+      tail = nullptr;
+      delete temp;
+      size--;
+  } else {
     // while loop over each node looking for a match
-        // if the next node bidID is equal to the current bidID
-        	// hold onto the next node temporarily
-         // make current node point beyond the next node
-         // now free up memory held by temp
-         // decrease size count
-         //return
+      while (temp->bid.bidId.compare(bidId) == 0) {
+        // hold onto the next node temporarily
+        prevNode = temp;
+        // make current node point beyond the next node
+        temp = temp->next;
+      }
 
-    // curretn node is equal to next node
-    }
-
+      prevNode->next = temp->next;
+      // now free up memory held by temp
+      delete temp;
+      // decrease size count
+      size--;
+  }
 }
 
 /**
@@ -173,19 +202,21 @@ void LinkedList::Remove(string bidId) {
  */
 Bid LinkedList::Search(string bidId) {
     // FIXME (6): Implement search logic
-
-    // special case if matching node is the head
-        // make head point to the next node in the list
-        //decrease size count
-        //return
-
     // start at the head of the list
-
+    Node* current = head;
     // keep searching until end reached with while loop (next != nullptr
-        // if the current node matches, return it
+    while (current != nullptr) {
+      // if the current node matches, return it
+      if (current->bid.bidId.compare(bidId) == 0) {
+        return current->bid;
+      } else {
         // else current node is equal to next node
+        current = current->next;
+      }
+    }
  
      //return bid
+     return current->bid;
 }
 
 /**
@@ -303,7 +334,7 @@ int main(int argc, char* argv[]) {
         break;
     default:
         csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
-        bidKey = "98109";
+        bidKey = "98110";
     }
 
     clock_t ticks;
