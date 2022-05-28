@@ -26,3 +26,139 @@ Chaining uses a list for each bucket where each list may store multiple items th
 - i.e. bucket 5 contains a list with [55, 75]
 
 Open addressing is where collisions are resolved by looking for an empty bucket elsewhere in the table
+
+---
+
+## Chaining
+
+Chaining uses a linked list to store multiple items at the same array index
+
+Example: We have a hash table with a size of 5, giving you 5 buckets to store items these buckets start off null or empty
+
+```
+  0| |
+  1| |
+  2| |
+  3| |
+  4| |
+```
+
+Now we want to store a key value pair in the hash table
+We won't store the value directly in the bucket, instead we wrap it in a Linked List node and have the bucket point to this node
+
+```
+Key = 6
+Value = A
+
+  0| |
+  1| | -> [A]
+  2| |
+  3| |
+  4| |
+```
+
+If we get another key value pair that gets assigned the same index, we go to the bucket at index 1 and store the value at the end of the linked list
+
+```
+Key = 11
+Value = C
+
+  0| |
+  1| | -> [A] -> [C]
+  2| |
+  3| |
+  4| |
+```
+
+## Open Addressing and Probing Algorithms
+
+### **Linear Probing**
+
+An algorithm that handles a collision by starting at the key's mapped bucket, and then linearly searches subsequent buckets until an empty bucket is found.
+
+Instead of storing values in linked lists you store them directly in buckets.
+
+The address of a key value pair is not determined by the hash function, we have to search for another empty bucket.
+
+Example: Using the same hash table as before, we want to store a key value pair in the hash table and we will store at the index the hash function assigned
+
+```
+Key = 6
+Value = A
+
+  0|    |
+  1|6, A|
+  2|    |
+  3|    |
+  4|    |
+```
+
+If we get another key value pair that gets assigned the same index, we have to look for another empty bucket, we call this process _probing_. With **linear probing**, we start from the current bucket, if it's full, we go to next bucket, if that's full, we keep going forward until we find an empty slot.
+
+If we can't find any empty slots, that means the table is full, a drawback to this approach that is not an issue with the chaining approach.
+
+```
+Key = 11
+Value = C
+
+  0|     |
+  1|6, A | <-- Start Here - FULL
+  2|11, C| <-- Next - AVAILABLE
+  3|     |
+  4|     |
+```
+
+Another issue with linear probing, is as you start filling the table, items start to form a cluster which causes issues when you get keys that fall in the same range.
+
+```
+  0|     |
+  1|6, A | )
+  2|11, C| ) CLUSTER
+  3|8, B | )
+  4|     |
+```
+
+Probing will take longer since you have to pass all items in the cluster to add the new item at the end, making the cluster bigger in the process.
+
+```
+Key = 21
+Value = D
+
+  0|     |
+  1|6, A | <-- Start Here - FULL
+  2|11, C| <-- Next - FULL
+  3|8, B | <-- Next - FULL
+  4|21, D| <-- Next - AVAILABLE
+```
+
+### **Quadratic Probing**
+
+An algorithm that handles a collision by starting at the key's mapped bucket, then quadratically searches subsequent buckets until an empty bucket is found.
+
+Quadratic probing helps solves linear probing's clustering problem since the key value pairs get spread out more widely.
+
+Linear Probing algo = hash(key) + i  
+Example: 1 2 3 4 5
+
+Quadratic Probing algo = hash(key) + i<sup>2</sup>  
+Example: 1 4 9 16 25
+
+However this could potentially add another drawback because of the big jumps taken to find another bucket, there's a chance the algorithm will get back to the beginning of the array after it's first loop and make the same steps, essentially resulting in an infinite loop. This would not happen with linear probing.
+
+### **Double Hashing**
+
+An algorithm that handles a collision by using 2 different hash functions to compute bucket indices.
+
+Instead of using `i` or `i^2` we'll use a separate independent hash function to calculate the number of steps, `i * hash2`.
+
+### <u>Probing Algorithm comparison</u>
+
+| Name        | Algorithm                          |
+| ----------- | ---------------------------------- |
+| Linear      | `(hash1 + i) % table_size`         |
+| Quadratic   | `(hash1 + i^2) % table_size`       |
+| Double Hash | `(hash1 + i * hash2) % table_size` |
+
+---
+
+## Common Hash Functions and Pseudocode
