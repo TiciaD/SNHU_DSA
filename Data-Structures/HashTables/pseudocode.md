@@ -195,3 +195,76 @@ bucketIndex = 60 % 100 = 60
 ### Multiplicative String Hash
 
 **multiplicative string hash** repeatedly multiplies the hash value and adds the ASCII (or Unicode) value of each character in the string.
+
+## Pseudocode
+
+Insert
+
+```
+FUNCTION Insert(int key):
+
+  VAR index
+  index = hashFunction(key);
+
+
+  WHILE table[index] != NULL && table[index]->key != key:
+    index = hashFunction(index + 1);
+  ENDWHILE
+
+  IF table[index] != NULL:
+    DELETE table[index]
+  ELSE:
+    table[index] = new Node(key, value)
+  ENDIF
+
+END
+```
+
+Remove
+
+```
+FUNCTION Remove(key):
+
+  VAR index
+  index = hashFunction(key);
+
+
+  WHILE table[index] != NULL:
+
+    IF table[index]->key == key:
+      break
+    ELSE:
+      index = hashFunction(index + 1)
+    ENDIF
+
+  ENDWHILE
+
+  IF table[index] == NULL:
+    RETURN "No Element found"
+  ELSE:
+    DELETE table[index];
+  ENDIF
+
+END
+```
+
+Search
+
+```
+FUNCTION Search(key):
+
+  VAR index
+  index = hashFunction(key);
+
+  WHILE table[index] != NULL && table[index]->key != key:
+    index = hashFunction(index + 1);
+  ENDWHILE
+
+  IF table[index] == NULL:
+    RETURN -1
+  ELSE:
+    RETURN table[index]->value;
+  ENDIF
+
+END
+```
