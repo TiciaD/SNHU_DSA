@@ -12,7 +12,7 @@
 #include <string> // atoi
 #include <time.h>
 
-#include "CSVparser.hpp"
+#include "CSVparser.cpp"
 
 using namespace std;
 
@@ -93,6 +93,7 @@ HashTable::HashTable() {
     // FIXME (1): Initialize the structures used to hold bids
     
     // Initalize node structure by resizing tableSize
+    nodes.resize(tableSize);
 }
 
 /**
@@ -102,7 +103,9 @@ HashTable::HashTable() {
  */
 HashTable::HashTable(unsigned int size) {
     // invoke local tableSize to size with this->
+    this->tableSize = size;
     // resize nodes size
+    nodes.resize(tableSize);
 }
 
 
@@ -111,7 +114,7 @@ HashTable::HashTable(unsigned int size) {
  */
 HashTable::~HashTable() {
     // FIXME (2): Implement logic to free storage when class is destroyed
-    
+    nodes.erase(nodes.begin());
     // erase nodes beginning
 }
 
@@ -127,6 +130,7 @@ HashTable::~HashTable() {
 unsigned int HashTable::hash(int key) {
     // FIXME (3): Implement logic to calculate a hash value
     // return key tableSize
+    return key % tableSize;
 }
 
 /**
@@ -137,13 +141,29 @@ unsigned int HashTable::hash(int key) {
 void HashTable::Insert(Bid bid) {
     // FIXME (5): Implement logic to insert a bid
     // create the key for the given bid
+    int key = hash(atoi(bid.bidId.c_str()));
+
     // retrieve node using key
+    Node* prevNode = &(nodes.at(key));
+
     // if no entry found for the key
-        // assign this node to the key position
+    if (prevNode == nullptr) {
+      // assign this node to the key position
+      Node* newNode = new Node(bid, key);
+      nodes.insert(nodes.begin() + key, (*newNode));
+    } else if (prevNode->key == UINT_MAX) {
     // else if node is not used
-         // assing old node key to UNIT_MAX, set to key, set old node to bid and old node next to null pointer
-    // else find the next open node
-            // add new newNode to end
+      // assing old node key to UNIT_MAX, set to key, set old node to bid and old node next to null pointer
+      prevNode->key = key;
+      prevNode->bid = bid;
+      prevNode->next = nullptr;
+    } else {
+      // else find the next open node
+      while (prevNode->next != nullptr) {
+        // add new newNode to end
+        prevNode = prevNode->next;
+      }
+    }
 }
 
 /**
@@ -152,12 +172,24 @@ void HashTable::Insert(Bid bid) {
 void HashTable::PrintAll() {
     // FIXME (6): Implement logic to print all bids
     // for node begin to end iterate
-    //   if key not equal to UINT_MAx
+    for (auto currNode = nodes.begin(); currNode != nodes.end(); ++currNode) {
+      //   if key not equal to UINT_MAx
+      if (currNode->key != UINT_MAX) {
+        // output key, bidID, title, amount and fund
+        cout << currNode->key << ": " << currNode->bid.bidId << " | " << currNode->bid.title << " | " << currNode->bid.amount << " | "
+            << currNode->bid.fund << endl;
+        // node is equal to next iter
+        Node* node = currNode->next;
+        while (node != nullptr) {
+          // while node not equal to nullptr
             // output key, bidID, title, amount and fund
-            // node is equal to next iter
-            // while node not equal to nullptr
-               // output key, bidID, title, amount and fund
-               // node is equal to next node
+            cout << node->key << ": " << node->bid.bidId << " | " << node->bid.title << " | " << node->bid.amount << " | "
+            << node->bid.fund << endl;
+            // node is equal to next node
+            node = node->next;
+        }
+      }
+    }
 
 }
 
@@ -169,7 +201,9 @@ void HashTable::PrintAll() {
 void HashTable::Remove(string bidId) {
     // FIXME (7): Implement logic to remove a bid
     // set key equal to hash atoi bidID cstring
+    int key = hash(atoi(bidId.c_str()));
     // erase node begin and key
+    nodes.erase(nodes.begin() + key);
 }
 
 /**
@@ -183,14 +217,29 @@ Bid HashTable::Search(string bidId) {
     // FIXME (8): Implement logic to search for and return a bid
 
     // create the key for the given bid
+    int key = hash(atoi(bidId.c_str()));
+    
+    Node* node = &(nodes.at(key));
     // if entry found for the key
-         //return node bid
+    if (node != nullptr && node->key != UINT_MAX && node->bid.bidId.compare(bidId) == 0) {
+      //return node bid
+      return node->bid;
+    }
 
     // if no entry found for the key
+    if (node == nullptr || node->key == UINT_MAX) {
       // return bid
+      return bid;
+    }
+
     // while node not equal to nullptr
-        // if the current node matches, return it
+    while (node != nullptr) {
+      // if the current node matches, return it
+      if (node->key != UINT_MAX && node->bid.bidId.compare(bidId) == 0) {
         //node is equal to next node
+        node = node->next;
+      }
+    }
 
     return bid;
 }
@@ -281,7 +330,7 @@ int main(int argc, char* argv[]) {
         break;
     default:
         csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
-        bidKey = "98109";
+        bidKey = "98094";
     }
 
     // Define a timer variable

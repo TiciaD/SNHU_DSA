@@ -162,3 +162,36 @@ Instead of using `i` or `i^2` we'll use a separate independent hash function to 
 ---
 
 ## Common Hash Functions and Pseudocode
+
+A hash table is fast if the hash function minimizes collisions.
+
+A perfect hash function maps items to buckets with no collision, this can be created if the number of items and all possible item keys are known beforehand.
+
+A good hash function should uniformly distribute items into buckets.
+
+- With **chaining**, a good hash function results in short linked lists in each bucket allowing for fast inserts, searches and removes
+- With **linear probing**, a good hash function will avoid hashing multiple items to consecutive buckets, lessening clusters and allowing for fast inserts, searches and removes
+
+### Modulo Hash
+
+**modulo hash** uses the remainder from dividing the key by hash table size
+`moduloHash(int key) { return key % table_size }`
+
+### Mid-square Hash
+
+**mid-square hash** a seed value is taken and squared, then some digits from that result are extracted and they become the new seed.
+
+The process of squaring and extracting middle digits reduces the likelihood of keys mapping to just a few buckets.
+
+Example:
+
+```
+Key = 40, numOfBuckets = 100, digitsToExtract = 2
+
+40 * 40 = 1600   // Middle 2 digits = 60
+bucketIndex = 60 % 100 = 60
+```
+
+### Multiplicative String Hash
+
+**multiplicative string hash** repeatedly multiplies the hash value and adds the ASCII (or Unicode) value of each character in the string.
