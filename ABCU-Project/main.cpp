@@ -101,14 +101,14 @@ void Courses::Append(Course course) {
 }
 
 /**
- * Simple output of all bids in the list
+ * Simple output of all courses in the list
  */
 void Courses::PrintCourses() {
     // start at the head
     Node* current = head;
     // while loop over each node looking for a match
     while (current != nullptr) {
-      //output current bidID, title, amount and fund
+      //output current courseNumber and course name
       std::cout << current->course.courseNumber << ", " << current->course.name << endl;
       //set current equal to next
       current = current->next;
@@ -155,6 +155,7 @@ vector<string> splitString(string str, char delimiter) {
       temp = "";
     }
   }
+  result.push_back(temp);
 
   return result;
 }
@@ -165,12 +166,12 @@ vector<string> splitString(string str, char delimiter) {
  *
  * @param course struct containing the course info
  */
-void displayBid(Course course) {
+void displayCourse(Course course) {
     cout << course.courseNumber << ", " << course.name << endl;
     if (course.prerequisites.size() > 0) {
       cout << "Prerequisites: ";
       for (int i = 0; i < course.prerequisites.size(); i++) {
-        cout << course.prerequisites[i] << ", " << endl;
+        cout << course.prerequisites[i] << ", ";
       }
     }
     return;
@@ -197,17 +198,19 @@ void loadCourses(string file, Courses *courseList) {
         // read data from file object and put it into string.
         getline(newfile, line);
 
-        // print the data of the string
-        cout << line << endl;
+        // split string by commas
         courseInfo = splitString(line, ',');
-        cout << courseInfo.at(0) << endl;
-        course.courseNumber = "MATH";
-        cout << courseInfo[0] << endl;
-        // course.courseNumber = courseInfo[0];
-        course.name = courseInfo[1];
-        cout << courseInfo.size() << endl;
+        // assign course number to 0th index in vector
+        course.courseNumber = courseInfo.at(0);
+        // assign course name to 1st index in vector
+        course.name = courseInfo.at(1);
+        // if vector size is greater than 2 there are prerequisites
         if (courseInfo.size() > 2) {
-          course.prerequisites = courseInfo;
+          // loop over remaining indices after first 2
+          for (int i = 2; i < courseInfo.size(); i++) {
+            // push each index after 1 to the prerequisites vector
+            course.prerequisites.push_back(courseInfo.at(i));
+          }
         }
         // add this course to the end
         courseList->Append(course);
@@ -225,17 +228,15 @@ int main() {
 	Console console;
   // Instantiate Display class
   Display display;
-
+  // Instantiate Courses class
   Courses courseList;
+  // Instantiate Course class
   Course course;
 
   // initialize option variable
 	int option{ 0 };
   // initialize searchItem variable
 	string searchItem{ "" };
-
-  vector<string> result;
-  vector<string> courses;
 
   // main loop, loop while option doesn't equal 4
 	while (option != 4) {
@@ -246,16 +247,21 @@ int main() {
 
     switch (option) {
       case 1:
-        cout << "You picked 1" << endl;
         loadCourses("ABCU.txt", &courseList);
-        courseList.PrintCourses();
         cout << endl;
         break;
       case 2:
-        cout << "You picked 2" << endl;
+        cout << "Here is a sample schedule:" << endl;
+        // print all courses
+        courseList.PrintCourses();
         break;
       case 3:
-        cout << "You picked 3" << endl;
+        // assign searchItem with string read from user input
+        searchItem = console.readString("What course do you want to know about? ");
+        // search for searchItem user input by calling Search function on courseList
+        course = courseList.Search(searchItem);
+        // print selected course and course prerequisites
+        displayCourse(course);
         break;
       case 4:
         cout << "Thank you for using the course planner!" << endl;

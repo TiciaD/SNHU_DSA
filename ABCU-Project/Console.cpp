@@ -12,7 +12,7 @@ float Console::readNumber(string prompt) {
         // Discard previous input
         cin.ignore(123, '\n');
     }
-    cout << "Successfully entered " << value << endl;
+
     return value;
 }
 
@@ -27,7 +27,7 @@ float Console::readNumber() {
         // Discard previous input
         cin.ignore(123, '\n');
     }
-    cout << "Successfully entered " << value << endl;
+
     return value;
 }
 
